@@ -17,7 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ua.test.myapp.model.User;
 import ua.test.myapp.services.DataService;
 
-@Controller
+@Controller("dataController")
 public class DataController {
 
 	@Autowired

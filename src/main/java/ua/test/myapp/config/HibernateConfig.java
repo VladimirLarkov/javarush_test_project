@@ -39,7 +39,7 @@ public class HibernateConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("database.driver"));
-        dataSource.setUrl(environment.getRequiredProperty("database.url"));
+        dataSource.setUrl(environment.getRequiredProperty("database.url") + "?characterEncoding=UTF-8");
         dataSource.setUsername(environment.getRequiredProperty("database.user"));
         dataSource.setPassword(environment.getRequiredProperty("database.password"));
         return dataSource;
@@ -58,4 +58,6 @@ public class HibernateConfig {
         txManager.setSessionFactory(s);
         return txManager;
     }
+
+
 }

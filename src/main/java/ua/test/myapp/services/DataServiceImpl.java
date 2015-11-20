@@ -10,7 +10,7 @@ import ua.test.myapp.model.User;
 
 import javax.transaction.Transactional;
 
-@Service
+@Service("dataServiceImpl")
 public class DataServiceImpl implements DataService {
 
 	@Autowired

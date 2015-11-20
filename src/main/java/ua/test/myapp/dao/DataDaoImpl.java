@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.test.myapp.model.User;
 
-@Repository
+@Repository("dataDaoImpl")
 public class DataDaoImpl implements DataDao {
 
 	private static final int ITEMS_PER_PAGE = 4;
