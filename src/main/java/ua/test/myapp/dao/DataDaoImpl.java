@@ -5,28 +5,31 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Repository;
 import ua.test.myapp.model.User;
 
-@Repository("dataDaoImpl")
+@Repository
 public class DataDaoImpl implements DataDao {
 
-	private static final int ITEMS_PER_PAGE = 4;
+	private static final int ITEMS_PER_PAGE = 5;
 
 	@Autowired
 	SessionFactory sessionFactory;
-	
+
 	public int getTotalPages() {
 		Session session = sessionFactory.openSession();
-		long count = ((Long) session.createQuery("select count(*) from User")
-				.uniqueResult());
-		int totalPages = (int)Math.ceil(count/ITEMS_PER_PAGE);
+		Criteria criteria = session.createCriteria(User.class);
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
+		int totalPages = (int)(count / ITEMS_PER_PAGE);
+		if (count % ITEMS_PER_PAGE != 0) {
+			totalPages = ++totalPages;
+		}
 		session.close();
 		return totalPages;
 	}
@@ -49,13 +52,15 @@ public class DataDaoImpl implements DataDao {
 	@Override
 	public List<User> getList(int page) {
 		Session session = sessionFactory.openSession();
-		Query query = session.createQuery("from User");
-		query.setMaxResults(ITEMS_PER_PAGE);
-		query.setFirstResult(page * ITEMS_PER_PAGE);
+		Criteria criteria = session.createCriteria(User.class);
+		criteria.setFirstResult(page * ITEMS_PER_PAGE);
+		criteria.setMaxResults(ITEMS_PER_PAGE);
+
 		@SuppressWarnings("unchecked")
-		List<User> userList = query.list();
+		List<User> firstPage = criteria.list();
+		criteria.setProjection(Projections.rowCount());// To get total row count
 		session.close();
-		return userList;
+		return firstPage;
 	}
 
 	@Override
@@ -68,10 +73,10 @@ public class DataDaoImpl implements DataDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getUsersByName(String name) {
-		Session session = sessionFactory.openSession();		
-		String query = "from User where name like " + "'" + name + "%'";
-
-		List<User> userList = session.createQuery(query).list();
+		Session session = sessionFactory.openSession();
+		Criteria criteria = session.createCriteria(User.class);
+		criteria.add(Restrictions.ilike("name", name + "%"));
+		List<User> userList = criteria.list();
 		session.close();
 		return userList;
 	}

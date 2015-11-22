@@ -17,7 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ua.test.myapp.model.User;
 import ua.test.myapp.services.DataService;
 
-@Controller("dataController")
+@Controller
 public class DataController {
 
 	@Autowired
@@ -41,9 +41,20 @@ public class DataController {
 	public ModelAndView getList(
 			@RequestParam(value = "page", defaultValue = "0", required = false) int page) {
 		List<User> userList = dataService.getList(page);
+		int totalPages = dataService.getTotalPages();
 		ModelAndView mav = new ModelAndView("list", "userList", userList);
-		mav.addObject("totalPages", dataService.getTotalPages());
+		int previousPage = page - 1;
+		if (previousPage < 0) {
+			previousPage = 0;
+		}
+		int nextPage = page + 1;
+		if (nextPage >= totalPages) {
+			nextPage = totalPages - 1;
+		}
+		mav.addObject("totalPages", totalPages);
 		mav.addObject("page", page);
+		mav.addObject("previousPage", previousPage);
+		mav.addObject("nextPage", nextPage);
 		return mav;
 	}
 
